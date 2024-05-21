@@ -8,7 +8,7 @@ export const Employees = () => {
 
     useEffect(() => {
         const getData = () => {
-            axios.get('http://localhost:5293/WeatherForecast')
+            axios.get('http://localhost:8080/api/employees')
             .then(response => {
                 console.log(response.data)
                 setEmployees(response.data)
