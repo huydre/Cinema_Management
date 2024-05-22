@@ -1,25 +1,21 @@
 import React, {useEffect, useState} from 'react'
 import { Sidebar } from '../../Components/Sidebar/Sidebar'
-import { getEmployees, fetchData } from '../../services/EmployeeServices'
+import { getEmployees } from '../../services/EmployeeServices'
 import axios from 'axios'
 
 export const Employees = () => {
     const [employees, setEmployees] = useState([])
 
     useEffect(() => {
-        const getData = () => {
-            axios.get('http://localhost:8080/api/employees')
-            .then(response => {
-                console.log(response.data)
-                setEmployees(response.data)
-            })
-            .catch(error => {
-                console.error(error)
-            })
+        const fetchEmployees = async () => {
+            const response = await getEmployees()
+            setEmployees(response)
         }
-        getData()
+        fetchEmployees()
     }, [])
 
+    console.log(employees)
+    
   return (
     <div className=" min-h-screen md:flex">
       <div className='w-3/12'>
