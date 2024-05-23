@@ -23,7 +23,7 @@ module.exports = {
         options: {
             encrypt: sqlEncrypt,
             enableArithAbort: true,
-            instancename: 'CINEMA_N19'
+            instancename: 'DESKTOP-ENIOI3O\CINEMA_N19'
         },
         port: 1433
     }

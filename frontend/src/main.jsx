@@ -5,6 +5,7 @@ import './index.css'
 import {NextUIProvider} from "@nextui-org/react";
 import { Employees } from './Pages/Employees/Employees.jsx';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Films } from './Pages/Films/Films.jsx';
 
 
 const router = createBrowserRouter([
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
     path: "/employees",
     element: <Employees />
   },
+  {
+    path: "/films",
+    element: <Films />
+  }
 ]);
 
 

@@ -39,6 +39,9 @@ app.use("/api/auth", authentication);
 var account = require("./routes/Account");
 app.use("/api/account", account);
 
+var film = require("./routes/Film");
+app.use("/api/films", film);
+
 
 var port = process.env.PORT || 8090;
 app.listen(port);

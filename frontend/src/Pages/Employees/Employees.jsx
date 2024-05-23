@@ -24,7 +24,7 @@ export const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [page, setPage] = useState(1);
 
-  const rowsPerPage = 12;
+  const rowsPerPage = 10;
 
   const pages = Math.ceil(employees.length / rowsPerPage);
 
@@ -43,8 +43,6 @@ export const Employees = () => {
     fetchEmployees();
   }, []);
 
-  console.log(employees);
-
   return (
     <div className=" min-h-screen md:flex">
       <div className="w-3/12">
@@ -62,7 +60,7 @@ export const Employees = () => {
               placeholder="Search by name..."
               startContent={<SearchIcon/>}
             />
-            <Button color="danger" endContent={<PlusIcon/>}>
+            <Button color="primary" endContent={<PlusIcon/>}>
               Add New
             </Button>
           </div>
@@ -79,7 +77,7 @@ export const Employees = () => {
                   isCompact
                   showControls
                   showShadow
-                  color="danger"
+                  color="primary"
                   page={page}
                   total={pages}
                   onChange={(page) => setPage(page)}
