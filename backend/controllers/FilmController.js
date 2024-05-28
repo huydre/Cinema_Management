@@ -29,7 +29,7 @@ async function insertFilm(film) {
         let insertFilm = await pool.request()
             .input('Name', sql.NVarChar, film.name)
             .input('Duration', sql.Int, film.duration)
-            .input('PosterPath', sql.NVarChar, film.poster_path)
+            .input('PosterPath', sql.NVarChar, film.posterPath)
             .input('Country', sql.NVarChar, film.country)
             .input('Overview', sql.NVarChar, film.overview)
             .execute('InsertFilm');
@@ -46,7 +46,7 @@ async function updateFilm(id, film) {
             .input('Id', sql.VarChar, id)
             .input('Name', sql.NVarChar, film.name)
             .input('Duration', sql.Int, film.duration)
-            .input('PosterPath', sql.NVarChar, film.poster_path)
+            .input('PosterPath', sql.NVarChar, film.posterPath)
             .input('Country', sql.NVarChar, film.country)
             .input('Overview', sql.NVarChar, film.overview)
             .execute('UpdateFilm');

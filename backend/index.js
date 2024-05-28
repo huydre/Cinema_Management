@@ -42,6 +42,21 @@ app.use("/api/account", account);
 var film = require("./routes/Film");
 app.use("/api/films", film);
 
+var room = require("./routes/Room");
+app.use("/api/rooms", room);
+
+var schedule = require("./routes/Schedule");
+app.use("/api/schedules", schedule);
+
+var seat = require("./routes/Seat");
+app.use("/api/seats", seat);
+
+var ticket = require("./routes/Ticket");
+app.use("/api/tickets", ticket);
+
+var helper = require("./routes/Helper");
+app.use("/api/helper", helper);
+ 
 
 var port = process.env.PORT || 8090;
 app.listen(port);
