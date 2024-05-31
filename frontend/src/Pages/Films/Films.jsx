@@ -22,8 +22,11 @@ import { EditIcon } from "../../assets/EditIcon";
 import { DeleteIcon } from "../../assets/DeleteIcon";
 import toast from "react-hot-toast";
 import { FilmsModal } from "../../Components/Films/FilmsModal";
+import { useSelector } from "react-redux";
 
 export const Films = () => {
+  const user = useSelector((state) => state.user);
+
   const [films, setFilms] = useState([]);
   const [modalState, setModalState] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -56,6 +59,8 @@ export const Films = () => {
     }
   };
 
+  console.log(user)
+
   return (
     <div className=" min-h-screen md:flex">
       <div className="w-3/12">
@@ -74,6 +79,7 @@ export const Films = () => {
               startContent={<SearchIcon />}
             />
             <Button
+              isDisabled={user?.TENNHOM !== "CONGTY" && user?.TENNHOM !== "db_owner"}
               onPress={onOpen}
               onClick={() => setModalState("Insert")}
               color="primary"
@@ -121,6 +127,7 @@ export const Films = () => {
                     <div className="relative flex items-center gap-2">
                       <Tooltip content="Chỉnh sửa phim">
                         <Button
+                          isDisabled={user?.TENNHOM !== "CONGTY" && user?.TENNHOM !== "db_owner"}
                           isIconOnly
                           variant="light"
                           onPress={onOpen}
@@ -134,12 +141,12 @@ export const Films = () => {
                           </span>
                         </Button>
                       </Tooltip>
-                      <Tooltip content="Xóa phim">
+                      <Tooltip isDisabled={user?.TENNHOM !== "CONGTY" && user?.TENNHOM !== "db_owner"} content="Xóa phim">
                         <span
                           onClick={() => handleDeleteFilm(films.id)}
-                          className="text-lg text-danger cursor-pointer active:opacity-50"
+                          className={`text-lg text-danger  active:opacity-50 ${user?.TENNHOM !== "CONGTY" && user?.TENNHOM !== "db_owner" ? "cursor-not-allowed opacity-30" : "cursor-pointer"}`}
                         >
-                          <DeleteIcon className="cursor-pointer" />
+                          <DeleteIcon />
                         </span>
                       </Tooltip>
                     </div>

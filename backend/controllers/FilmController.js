@@ -68,11 +68,22 @@ async function deleteFilm(filmId) {
     }
 }
 
+async function getTop3Highest() {
+    try {
+        let pool = await sql.connect(config.sql);
+        let films = await pool.request().execute('Top3HighestGrossingFilms');
+        return films.recordsets;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 module.exports = {
     getAllFilms,
     getFilmById,
     insertFilm,
     updateFilm,
-    deleteFilm
+    deleteFilm,
+    getTop3Highest
 }

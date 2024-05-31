@@ -12,14 +12,18 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.3.6",
+    "apexcharts": "^3.49.1",
     "axios": "^1.7.1",
     "framer-motion": "^11.2.5",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
     "react": "^18.2.0",
+    "react-apexcharts": "^1.4.1",
+    "react-barcode": "^1.5.3",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.23.1",
+    "react-to-print": "^2.15.1",
     "remixicon": "^4.2.0",
     "sort-by": "^1.2.0"
   },

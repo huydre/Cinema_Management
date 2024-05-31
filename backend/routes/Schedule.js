@@ -3,7 +3,7 @@ var router = express.Router();
 var dboperations = require('../controllers/ScheduleController');
 
 router.get('/', (req, res) => {
-    dboperations.getAllSchedule().then(result => {
+    dboperations.getAllSchedule(req.headers).then(result => {
         if(result) {
             res.json(result[0]);
         } else {

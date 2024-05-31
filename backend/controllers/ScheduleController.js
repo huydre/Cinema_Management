@@ -1,9 +1,10 @@
 var config = require('../config');
 const sql = require('mssql');
+const getUserConfig = require('../config');
 
-async function getAllSchedule() {
+async function getAllSchedule(data) {
     try {
-        let pool = await sql.connect(config.sql);
+        let pool = await sql.connect(getUserConfig(data.user, data.password, data.server, data.server).sql);
         let schedules = await pool.request().execute('GetAllSchedule');
         return schedules.recordsets;
     } catch (error) {

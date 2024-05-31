@@ -53,4 +53,30 @@ router.post('/login', (req, res) => {
     });
 });
 
+router.get('/getlogininfo', (req, res) => {
+    dboperations.getLoginInfo(req.headers).then(result => {
+        if(result) {
+            res.json(result.recordset[0]);
+        } else {
+            res.status(500).send('Error retrieving login info');
+        }
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send('Error retrieving login info');
+    });
+});
+
+router.post('/checklogin', (req, res) => {
+    dboperations.checkLogin(req.body).then(result => {
+        if(result) {
+            res.json("OK");
+        } else {
+            res.status(500).send('Error checking login');
+        }
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send('Error checking login');
+    });
+});
+
 module.exports = router;

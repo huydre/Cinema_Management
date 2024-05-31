@@ -17,7 +17,7 @@ var dboperations = require('../controllers/EmployeeController');
  *         description: Error retrieving employees
  */
 router.get('/', (req, res) => {
-    dboperations.getEmployee().then(result => {
+    dboperations.getEmployee(req.headers).then(result => {
         if(result) {
             res.json(result[0]);
         } else {

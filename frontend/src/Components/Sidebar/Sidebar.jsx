@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Logo } from "../../assets/Logo";
-import { User } from "@nextui-org/react";
+import { Divider, User } from "@nextui-org/react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getLoginInfo } from "../../services/Authentication";
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from "../../redux/action/action";
 
 export const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const data = useSelector(state => state.data);
+  const user = useSelector(state => state.user);
 
   const menus = [
     {
@@ -110,6 +117,26 @@ export const Sidebar = () => {
     },
   ];
 
+  const getUser = async () => {
+    const userme = await getLoginInfo(data);
+    dispatch(setUser(userme));
+    if (!userme) {
+      navigate("/login");
+    }
+    // setUser(user);
+  }
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("state");
+    navigate("/login");
+  };
+
+  console.log(user);
+
   return (
     <nav className="flex flex-col gap-4 p-8 w-full h-full border-r-1 border-slate-200">
       <div className="flex space-x-2 items-center pb-8">
@@ -118,8 +145,8 @@ export const Sidebar = () => {
       </div>
       <div>
         <User
-          name="Admin"
-          description="admin"
+          name={user?.HOTEN || "Admin"}
+          description={(user?.MANV || 'Admin')  + "-" + (user?.TENNHOM || 'Admin')}
           avatarProps={{
             src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
           }}
@@ -141,6 +168,7 @@ export const Sidebar = () => {
           </button>
         ))}
       </div>
+      <Divider orientation="horzital" />
       <div className="justify-self-end">
         <a
           href=""
@@ -148,12 +176,12 @@ export const Sidebar = () => {
         >
           Help & Information
         </a>
-        <a
-          href=""
+        <button
+          onClick={() => handleLogout()}
           className={`flex items-center gap-2 p-3 rounded-lg w-full font-medium hover:bg-gray-200 text-gray-500`}
         >
-          Log Out
-        </a>
+          Đăng Xuất
+        </button>
       </div>
     </nav>
   );

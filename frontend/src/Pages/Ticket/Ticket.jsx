@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Sidebar } from "../../Components/Sidebar/Sidebar";
 import {
   Button,
@@ -18,7 +18,10 @@ import { getFilms } from "../../services/FilmServices";
 import { getScheduleByFilmId } from "../../services/ScheduleServives";
 import { getSeatsByRoomAndSchedule } from "../../services/SeatServices";
 import { purchaseTicket } from "../../services/TicketServices";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { useReactToPrint } from "react-to-print";
+import Barcode from "react-barcode";
 
 export const Ticket = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -29,9 +32,18 @@ export const Ticket = () => {
   const [selectedFilm, setSelectedFilm] = useState(null);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
+  const user = useSelector((state) => state.user);
+  const contentToPrint = useRef(null);
 
   const rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
   const seatsPerRow = 9;
+
+  const handlePrint = useReactToPrint({
+    documentTitle: "Print This Document",
+    onBeforePrint: () => console.log("before printing..."),
+    onAfterPrint: () => console.log("after printing..."),
+    removeAfterPrint: true,
+  });
 
   useEffect(() => {
     const fetchFilms = async () => {
@@ -97,7 +109,9 @@ export const Ticket = () => {
 
   const handleCheckSelectedSeat = (number, row) => {
     if (seat.length === 0) return "ok";
-    return seat[0].some(item => item.SeatNumber == number.toString() && item.SeatRow == row);
+    return seat[0].some(
+      (item) => item.SeatNumber == number.toString() && item.SeatRow == row
+    );
   };
 
   const handleSelectSeat = (number, row) => {
@@ -113,18 +127,20 @@ export const Ticket = () => {
       seatRow: selectedSeat.row,
       roomId: selectedSchedule.RoomId,
       price: 50000,
-      employeeId: "CN1NV01",
+      employeeId: user.MANV,
     };
     try {
       await purchaseTicket(ticket);
-      toast.success('Đặt vé thành công');
+      toast.success("Đặt vé thành công");
+      setState("Thành Công");
       console.log(ticket);
     } catch (error) {
       console.error(error);
-      toast.error('Đặt vé thất bại');
+      toast.error("Đặt vé thất bại");
     }
-    
   };
+
+  console.log(schedules);
 
   return (
     <div className=" min-h-screen md:flex">
@@ -137,7 +153,7 @@ export const Ticket = () => {
         <div className="m-4 space-y-4">
           <h1 className="font-bold text-2xl">Mua Vé</h1>
 
-          <Modal size="5xl" isOpen={isOpen} onOpenChange={onOpenChange}>
+          <Modal size="2xl" isOpen={isOpen} onOpenChange={onOpenChange}>
             <ModalContent>
               {(onClose) => (
                 <>
@@ -158,35 +174,39 @@ export const Ticket = () => {
                             </h2>
                             <p>{selectedFilm.overview}</p>
                             <p>
-                              Thời lượng:{" "}
+                              <span className="text-sm font-medium">
+                                Thời lượng:{" "}
+                              </span>
                               {convertDuration(selectedFilm.duration)}
                             </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-4 mt-4">
-                          {schedules.length ? (
-                            schedules.map((schedule) => (
-                              <div>
-                                <Button
-                                  onClick={() => handleChooseSchedule(schedule)}
-                                  size="sm"
-                                  radius="full"
-                                  color="primary"
-                                  variant="bordered"
-                                >
-                                  {convertTime(
-                                    schedule.StartTime,
-                                    schedule.EndTime
-                                  )}
-                                </Button>
-                              </div>
-                            ))
-                          ) : (
-                            <div>
-                              <p>Không có lịch chiếu</p>
+                            <p className="text-sm font-medium">Khung giờ</p>
+                            <div className="grid grid-cols-2 mt-4 gap-4">
+                              {schedules.length ? (
+                                schedules.map((schedule) => (
+                                  <div key={schedule.ScheduleId}>
+                                    <Button
+                                      onClick={() =>
+                                        handleChooseSchedule(schedule)
+                                      }
+                                      size="sm"
+                                      radius="full"
+                                      color="primary"
+                                      variant="bordered"
+                                    >
+                                      {convertTime(
+                                        schedule.StartTime,
+                                        schedule.EndTime
+                                      )}
+                                    </Button>
+                                  </div>
+                                ))
+                              ) : (
+                                <div>
+                                  <p>Không có lịch chiếu</p>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </div>
                       </>
                     )}
@@ -255,7 +275,9 @@ export const Ticket = () => {
                                   { length: seatsPerRow },
                                   (_, seatIndex) => (
                                     <div
-                                    onClick={() => handleSelectSeat(seatIndex + 1, row)}
+                                      onClick={() =>
+                                        handleSelectSeat(seatIndex + 1, row)
+                                      }
                                       className={`m-2 w-10 h-10 p-2 rounded-md text-center text-white  ${
                                         handleCheckSelectedSeat(
                                           seatIndex + 1,
@@ -290,57 +312,112 @@ export const Ticket = () => {
                         </div>
                       </div>
                     )}
-                    {
-                      state === "Xác nhận thông tin" && (
-                        <div className="flex gap-8">
-                          <div>
-                            <Image width={300} src={selectedFilm.posterPath} alt={selectedFilm.name} />
-                          </div>
-                          <div className="flex flex-col justify-between">
-                            <div>
-                              <p className="text-xl">{selectedFilm.name}</p>
-                              <p className="font-semibold">
-                                {selectedSchedule.StartTime.slice(0, 10)}
-                                <span className="mx-2">|</span>
-                                {convertTime(selectedSchedule.StartTime, selectedSchedule.EndTime)}
-                              </p>
-                              <p>Phòng Chiếu: {selectedSchedule.RoomName}</p>
-                              <p>Ghế: {selectedSeat.row + selectedSeat.number}</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold">Tạm tính: 50.000đ</p>
-                                
-                            </div>
-                          </div>
-                          
+                    {state === "Xác nhận thông tin" && (
+                      <div className="flex gap-8">
+                        <div>
+                          <Image
+                            width={300}
+                            src={selectedFilm.posterPath}
+                            alt={selectedFilm.name}
+                          />
                         </div>
-                      )
-                    }
+                        <div className="flex flex-col justify-between">
+                          <div className="space-y-4">
+                            <p className="text-xl">{selectedFilm.name}</p>
+                            <p className="font-semibold">
+                              {selectedSchedule.StartTime.slice(0, 10)}
+                              <span className="mx-2">|</span>
+                              {convertTime(
+                                selectedSchedule.StartTime,
+                                selectedSchedule.EndTime
+                              )}
+                            </p>
+                            <p>Phòng Chiếu: {selectedSchedule.RoomName}</p>
+                            <p>Ghế: {selectedSeat.row + selectedSeat.number}</p>
+                          </div>
+                          <div>
+                            <p className="font-semibold">Tạm tính: 50.000đ</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {state === "Thành Công" && (
+                      <div ref={contentToPrint} className="flex justify-center">
+                        <style>
+                          {`
+                            @media print {
+                              @page {
+                                size: A4 portrait;
+                                margin: 0;
+                              }
+                            }
+                          `}
+                        </style>
+                        <div className="flex flex-col justify-between p-2">
+                          <div className="space-y-4">
+                            <p className="text-xl">Đặt vé thành công</p>
+
+                            <Barcode value={selectedFilm.name} />
+                            <p className="font-semibold">{selectedFilm.name}</p>
+                            <p className="font-semibold space-y-4">
+                              {selectedSchedule.StartTime.slice(0, 10)}
+                              <span className="mx-2">|</span>
+                              {convertTime(
+                                selectedSchedule.StartTime,
+                                selectedSchedule.EndTime
+                              )}
+                            </p>
+                            <p>Phòng Chiếu: {selectedSchedule.RoomName}</p>
+                            <p>Ghế: {selectedSeat.row + selectedSeat.number}</p>
+                          </div>
+                          <div className="mt-4">
+                            <p className="font-semibold">Tổng: 50.000đ</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </ModalBody>
                   <ModalFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
                       Close
                     </Button>
-                    {
-                      state === "Xác nhận thông tin" && (
-                        <Button color="primary" onClick={() => handlePurchaseTicket()} onPress={onClose}>
-                          Xác nhận
-                        </Button>
-                      )
-                    }
+                    {state === "Xác nhận thông tin" && (
+                      <Button
+                        color="primary"
+                        onClick={() => handlePurchaseTicket()}
+                        // onPress={onClose}
+                      >
+                        Xác nhận
+                      </Button>
+                    )}
+                    {state === "Thành Công" && (
+                      <Button
+                        onClick={() => {
+                          handlePrint(null, () => contentToPrint.current);
+                        }}
+                        color="primary"
+                        // onPress={onClose}
+                      >
+                        In Vé
+                      </Button>
+                    )}
                   </ModalFooter>
                 </>
               )}
             </ModalContent>
           </Modal>
 
-          <div className="grid grid-cols-4 pt-8">
+          <div className="grid grid-cols-5 pt-8">
             {films.map((film) => (
               <div
                 onClick={() => handleChooseFilm(film)}
                 className="relative p-4 shadow-lg "
               >
-                <img src={film.posterPath} alt={film.name} />
+                <img
+                  className="rounded-xl"
+                  src={film.posterPath}
+                  alt={film.name}
+                />
                 {/* <div className="absolute z-20 left-0 bottom-4 p-2 font-medium ml-4 mr-2 bg-black/20 text-white backdrop-blur-sm rounded-lg w-[calc(100%-32px)]">
                   <h2>{film.name}</h2>
                   <p className="">{convertDuration(film.duration)}</p>

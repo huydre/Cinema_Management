@@ -52,3 +52,13 @@ export const deleteFilm = async (id) => {
         return error;
     }
 }
+
+export const getTop3Highest = async () => {
+    try {
+        const response = await API.get("films/top");
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return error;
+    }
+}

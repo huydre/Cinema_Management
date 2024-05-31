@@ -1,9 +1,11 @@
 var config = require('../config');
 const sql = require('mssql');
+const getUserConfig = require('../config');
 
-async function getEmployee() {
+async function getEmployee(data) {
     try {
-        let pool = await sql.connect(config.sql);
+        let pool = await sql.connect(getUserConfig(data.user, data.password, data.server, data.server).sql);
+        console.log(pool);
         let employees = await pool.request().execute('GetAllEmployees');
         return employees.recordsets;
     } catch (error) {

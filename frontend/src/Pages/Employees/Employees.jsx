@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Sidebar } from "../../Components/Sidebar/Sidebar";
-import { getEmployees } from "../../services/EmployeeServices";
+import { deleteEmployee, getEmployees } from "../../services/EmployeeServices";
 import axios from "axios";
 import {
   Button,
@@ -14,15 +14,24 @@ import {
   TableHeader,
   TableRow,
   Tooltip,
+  useDisclosure
 } from "@nextui-org/react";
 import { EditIcon } from "../../assets/EditIcon";
 import { DeleteIcon } from "../../assets/DeleteIcon";
 import { SearchIcon } from "../../assets/SearchIcon";
 import { PlusIcon } from "../../assets/PlusIcon";
+import { useSelector } from 'react-redux';
+import { EmployeeModal } from "../../Components/Employee/EmployeeModal";
 
 export const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [page, setPage] = useState(1);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [modalState, setModalState] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
+
+  const data = useSelector(state => state.data);
+  const user = useSelector(state => state.user);
 
   const rowsPerPage = 10;
 
@@ -35,13 +44,23 @@ export const Employees = () => {
     return employees.slice(start, end);
   }, [page, employees]);
 
+  const fetchEmployees = async () => {
+    const response = await getEmployees(data);
+    setEmployees(response);
+  };
+
   useEffect(() => {
-    const fetchEmployees = async () => {
-      const response = await getEmployees();
-      setEmployees(response);
-    };
     fetchEmployees();
-  }, []);
+  }, [isOpen]);
+
+  const handleDeleteEmployee = async (id) => {
+    try {
+      await deleteEmployee(id);
+      fetchEmployees();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className=" min-h-screen md:flex">
@@ -60,14 +79,14 @@ export const Employees = () => {
               placeholder="Search by name..."
               startContent={<SearchIcon/>}
             />
-            <Button color="primary" endContent={<PlusIcon/>}>
+            <Button onPress={onOpen} onClick={() => setModalState("Insert")} isDisabled={user?.TENNHOM === "NHANVIEN"} color="primary" endContent={<PlusIcon/>}>
               Add New
             </Button>
           </div>
           <p className="text-default-400 text-small">
             Total <span>{employees.length}</span> Nhân Viên
           </p>
-
+          <EmployeeModal isOpen={isOpen} onOpenChange={onOpenChange} state={modalState} id={employeeId}/>
           <Table
             selectionMode="single"
             data={employees}
@@ -116,14 +135,23 @@ export const Employees = () => {
                   <TableCell>{employee.cinemaId}</TableCell>
                   <TableCell>
                     <div className="relative flex items-center gap-2">
-                      <Tooltip content="Chỉnh sửa nhân viên">
-                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                          <EditIcon className="cursor-pointer" />
-                        </span>
+                      <Tooltip isDisabled={user?.TENNHOM === "NHANVIEN"} content="Chỉnh sửa nhân viên">
+                        <Button isIconOnly
+                          variant="light"
+                          onPress={onOpen}
+                          onClick={() => {
+                            setModalState("Edit");
+                            setEmployeeId(employee.uid);
+                          }}>
+                          <span className={`text-lg text-default-400  active:opacity-50 ${user?.TENNHOM === "NHANVIEN" ? "cursor-not-allowed opacity-30" : "cursor-pointer"}`}>
+                            <EditIcon />
+                          </span>
+                        </Button>
+                        
                       </Tooltip>
-                      <Tooltip content="Xóa nhân viên">
-                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                          <DeleteIcon className="cursor-pointer" />
+                      <Tooltip isDisabled={user?.TENNHOM === "NHANVIEN"} content="Xóa nhân viên">
+                        <span onClick={() => handleDeleteEmployee(employee.uid)} className={`text-lg text-danger  active:opacity-50 ${user?.TENNHOM === "NHANVIEN" ? "cursor-not-allowed opacity-30" : "cursor-pointer"}`}>
+                          <DeleteIcon />
                         </span>
                       </Tooltip>
                     </div>

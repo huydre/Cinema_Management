@@ -11,20 +11,22 @@ const sqlEncrypt = process.env.SQL_ENCRYPT === 'true';
 assert(PORT, 'PORT is required');
 assert(HOST, 'HOST is required');
 
-module.exports = {
-    port: PORT,
-    host: HOST,
-    url: HOST_URL,
-    sql: {
-        server: SQL_SERVER,
-        database: SQL_DATABASE,
-        user: SQL_USER,
-        password: SQL_PASSWORD,
-        options: {
-            encrypt: sqlEncrypt,
-            enableArithAbort: true,
-            instancename: 'DESKTOP-ENIOI3O\CINEMA_N19'
-        },
-        port: 1433
+module.exports = function getUserConfig(user = SQL_USER, password = SQL_PASSWORD, instanceName = 'DESKTOP-ENIOI3O\\CINEMA_N19', server = SQL_SERVER) {
+    return {
+        port: PORT,
+        host: HOST,
+        url: HOST_URL,
+        sql: {
+            server: server,
+            database: SQL_DATABASE,
+            user: user,
+            password: password,
+            options: {
+                encrypt: sqlEncrypt,
+                enableArithAbort: true,
+                instancename: instanceName
+            },
+            port: 1433
+        }
     }
 }

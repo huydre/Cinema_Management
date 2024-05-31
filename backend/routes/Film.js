@@ -3,6 +3,18 @@ var router = express.Router();
 var dboperations = require('../controllers/FilmController');
 
 
+router.get('/top', (req, res) => {
+    dboperations.getTop3Highest().then(result => {
+        if(result) {
+            res.json(result[0]);
+        } else {
+            res.status(500).send('Error retrieving films');
+        }
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send('Error retrieving films');
+    });
+});
 
 /**
  * @swagger
@@ -183,6 +195,9 @@ router.delete('/:id', (req, res) => {
         res.status(500).send('Error deleting film');
     });
 });
+
+
+
 
 
 
